@@ -3,8 +3,7 @@ let countryData;
 let euroCountries;
 let jointCoinData;
 
-// Load CSV data
-d3.csv('public/dataset2.csv').then(function (data) {
+d3.csv('public/dataset.csv').then(function (data) {
   countryData = data;
   euroCountries = [...new Set(data.map(row => row.Country_map_name))];
 });
@@ -17,15 +16,15 @@ d3.csv('public/datasetAreaCoins.csv').then(function (data) {
 const width = 1050;
 const height = 690;
 const startYear = "2023";
-let selectedYear = startYear;
-let selectedCountry = "Slovakia";
 const vaticanCoords = [12.36062, 41.88378];
 const smallCountries = ['Vatican City', 'Monaco', 'Luxembourg', 'San Marino', 'Andorra', 'Malta'];
+const colorScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, 1]);
 
-// Variables used for sorting values in the table
+// Variables
 var sortBy = "year";
 var sortOrderAscending = false;
-
+let selectedYear = startYear;
+let selectedCountry = "Slovakia";
 var countries;
 
 // Map setup
@@ -97,8 +96,6 @@ function customInterpolation(input) {
   else return 1;
 }
 
-const colorScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, 1]);
-
 // Calculate the color to be assigned
 function createFill(country, selectedYear) {
   const defaultCountryName = "Vatican City";
@@ -118,6 +115,7 @@ function createFill(country, selectedYear) {
   }
 }
 
+// Create a tooltip that is shown when user hovers over the area
 function createTooltip(country, selectedYear) {
   if (!country) return "";
   
@@ -147,7 +145,7 @@ function createTooltip(country, selectedYear) {
   }
 }
 
-// Function to update the map based on the selected year
+// Update the map based on the selected year
 function updateMap(selectedYear) {
   svg.selectAll('path title').remove();
 
@@ -205,7 +203,7 @@ function isSmallCountry(country) {
   return smallCountries.includes(countryName);
 }
 
-// outline of the selected country
+// Outline of the selected country
 function highlightCountry(countryName) {
   if (!euroCountries.includes(countryName)) return;
   
@@ -288,6 +286,9 @@ function addLegend() {
     .text((d, i) => (i === legendValues.length - 1) ? `${d}€+` : `${d}€`);
 }
 
+addLegend();
+
+// Aux sorting methods
 function sortDataByMintage(countryDatas) {
   return countryDatas.sort((a, b) => a.Mint_count - b.Mint_count);
 }
@@ -306,8 +307,7 @@ function sortTable(column, order) {
   updateTable();
 }
 
-addLegend();
-
+// The table of coins
 function updateTable() {
   if (!euroCountries.includes(selectedCountry)) {
     return;
@@ -367,7 +367,7 @@ function updateTable() {
             <div class="header-text">Description</div>
           </th>
           <th>
-            <div class="header-text">Value</div>
+            <div class="header-text">Price</div>
             <div class="sort-buttons">
               <button id="sortPriceAsc">&#x25B2;</button>
               <button id="sortPriceDsc">&#x25BC;</button>
@@ -392,6 +392,7 @@ function updateTable() {
   document.getElementById('countryTable').innerHTML = tableHeader + tableHTML;
   updateYearColor(selectedYear);
 
+  // sorting buttons functionality
   document.getElementById('sortYearAsc').addEventListener('click', function() {
     sortTable('year', true);
   });
@@ -414,10 +415,12 @@ function updateTable() {
   });
 }
 
+// Number formatting
 function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+// Interpolations of minatage to set proper icon size
 function mintageWidth(x){
   if (x <= 50000) return 20;
   else if (x <= 500000) return 20 + (x - 50000) / (500000 - 50000) * (30 - 20);
@@ -426,6 +429,7 @@ function mintageWidth(x){
   else return 50;
 }
 
+// Highlight current year in the table
 function updateYearColor(year) {
   const yearCells = document.getElementsByClassName('year-cell');
   
@@ -434,6 +438,7 @@ function updateYearColor(year) {
   });
 }
 
+// Box for commonly issued coin by the whole EU
 function updateJoint(selectedYear) {
   const countryData = jointCoinData.find(entry => entry.Mintage_year === selectedYear);
 

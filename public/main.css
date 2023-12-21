@@ -28,18 +28,12 @@ body {
   cursor: pointer
 }
 
-#timeline input[type=range]::-webkit-slider-thumb {
-  width: 15px;
-  height: 20px;
-  background-color: #fff;
-  cursor: pointer
-}
-
+#timeline input[type=range]::-webkit-slider-thumb,
 #timeline input[type=range]::-moz-range-thumb {
   width: 15px;
   height: 20px;
   background-color: #fff;
-  cursor: pointer
+  cursor: pointer;
 }
 
 #labelsContainer {
